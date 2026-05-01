@@ -2,15 +2,22 @@ package edu.unlam.paradigmas.basicas.ej01;
 
 import java.lang.Math;
 
-public class Rango {
+public class Rango implements Comparable<Rango>{
 	
 	private Double limIzq;
 	private Double limDer;
-	private Intervalo intervalo;
+	private final Intervalo intervalo;
 	
 	private Rango(Double limIzq, Double limDer, Intervalo intervalo) {
-		this.limIzq = limIzq;
-		this.limDer = limDer;
+		
+		if(limIzq.compareTo(limDer) > 0) {	// El límite izquierdo no puede ser superior al derecho.
+			this.limIzq = limDer;			// En caso de que el parámetro izquierdo sea mayor al
+			this.limDer = limIzq;			// derecho, invertimos los límites.
+		}
+		else {
+			this.limIzq = limIzq;
+			this.limDer = limDer;
+		}
 		this.intervalo = intervalo;
 	}
 	
@@ -54,7 +61,7 @@ public class Rango {
 		
 		final Rango otro = (Rango)obj;
 		
-		if(this.intervalo == otro.intervalo && this.limIzq == otro.limIzq && this.limDer == otro.limDer) {
+		if(this.intervalo == otro.intervalo && this.limIzq.equals(otro.limIzq) && this.limDer.equals(otro.limDer)) {
 			return true;
 		}
 		
@@ -94,7 +101,6 @@ public class Rango {
 	}
 	
 	public boolean contiene(Rango otro) {
-		
 		if(this.equals(otro)) {
 			return true;
 		}
@@ -106,32 +112,21 @@ public class Rango {
 		return false;
 	}
 	
-	public double comparar(Rango otro) {
-		
-		if(this.equals(otro)) {
+	@Override
+	public int compareTo(Rango otro) {
+		if(this.equals(otro)) {		// Verificamos si son iguales. Si lo son, retornamos 0 y evitamos hacer las siguientes comparaciones
 			return 0;
 		}
 		
-		if(this.limIzq != otro.limIzq) {
-			return this.limIzq - otro.limIzq;
+		if(!this.limIzq.equals(otro.limIzq)) { 	// Comparamos izquierda (valores)
+			return this.limIzq.compareTo(otro.limIzq); 
 		}
 		
-		if(this.limDer != otro.limDer) {
-			return this.limDer - otro.limDer;
+		if(!this.limDer.equals(otro.limDer)) {	// Empató izquierda, se decide por la derecha
+			return this.limDer.compareTo(otro.limDer);
 		}
 		
-		if(this.intervalo.getIzq() != otro.intervalo.getIzq()) {
-			if(this.intervalo.getIzq()) {
-				return 1;
-			}
-			return -1;
-		}
-		
-		if(this.intervalo.getDer()) {
-			return 1;
-		}
-		
-		return -1;
+		return this.intervalo.ordinal() - otro.intervalo.ordinal(); // Empataron izquierda y derecha, decidimos según la prioridad de los tipos de intervalo
 	}
 	
 	public static Rango supraRango() {
@@ -161,9 +156,13 @@ public class Rango {
 	
 	public boolean hayInterseccion(Rango otro) {
 		
-		if(this.limDer > otro.limIzq) {
+		Double limIzq = Math.max(this.limIzq, otro.limIzq);
+		Double limDer = Math.min(this.limDer, otro.limDer);
+		
+		if(limDer.compareTo(limIzq) > 0) {
 			return true;
 		}
+		
 		return false;
 	}
 	
@@ -175,17 +174,17 @@ public class Rango {
 		Double interLimIzq = Math.max(this.limIzq, otro.limIzq);
 		Double interLimDer = Math.min(this.limDer, otro.limDer);
 		
-		boolean interIncluyeIzq = (this.limIzq > otro.limIzq) 				
-				? this.intervalo.getIzq() : otro.intervalo.getIzq();
-		boolean interIncluyeDer = (this.limDer > otro.limDer) 
-				? this.intervalo.getDer() : otro.intervalo.getDer();
+		boolean interIncluyeIzq = (this.limIzq.compareTo(otro.limIzq) > 0) 						
+				? this.intervalo.getIzq() : otro.intervalo.getIzq();	// del mayor límite izquierdo, guardamos si está incluído o no
+		boolean interIncluyeDer = (this.limDer.compareTo(otro.limDer) < 0) 
+				? this.intervalo.getDer() : otro.intervalo.getDer();	// del menor límite derecho, guardamos si está incluído o no
 		
-		if(interIncluyeIzq && interIncluyeDer) {
-			return Rango.intervaloCerrado(interLimIzq, interLimDer);
-		}
-		if(interIncluyeIzq && !interIncluyeDer) {
-			return Rango.intervaloAbiertoDer(interLimIzq, interLimDer);
-		}
+		if(interIncluyeIzq && interIncluyeDer) {						// Nos fijamos qué
+			return Rango.intervaloCerrado(interLimIzq, interLimDer);	// tipo de intervalo es
+		}																// según sus límites
+		if(interIncluyeIzq && !interIncluyeDer) {						// y decidimos qué
+			return Rango.intervaloAbiertoDer(interLimIzq, interLimDer);	// método usar en base
+		}																// a eso
 		if(!interIncluyeIzq && interIncluyeDer) {
 			return Rango.intervaloAbiertoIzq(interLimIzq, interLimDer);
 		}

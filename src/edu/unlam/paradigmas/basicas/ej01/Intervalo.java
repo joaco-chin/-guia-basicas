@@ -1,13 +1,13 @@
 package edu.unlam.paradigmas.basicas.ej01;
 
 public enum Intervalo {
-	CERRADO(true, true),
 	ABIERTO(false, false),
+	ABIERTO_DER(true, false),
 	ABIERTO_IZQ(false, true),
-	ABIERTO_DER(true, false);
+	CERRADO(true, true);
 	
-	private boolean incluyeIzq;
-	private boolean incluyeDer;
+	private final boolean incluyeIzq;
+	private final boolean incluyeDer;
 	
 	Intervalo(boolean incluyeIzq, boolean incluyeDer) {
 		this.incluyeIzq = incluyeIzq;
@@ -23,10 +23,10 @@ public enum Intervalo {
 	}
 	
 	public char toCharIzq() {
-		return (this.incluyeIzq == true) ? '[' : '(';
+		return this.incluyeIzq ? '[' : '(';
 	}
 	
 	public char toCharDer() {
-		return (this.incluyeDer == true) ? ']' : ')';
+		return this.incluyeDer ? ']' : ')';
 	}
 }
