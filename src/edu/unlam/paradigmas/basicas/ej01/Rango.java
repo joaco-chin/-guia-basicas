@@ -4,9 +4,11 @@ import java.lang.Math;
 
 public class Rango implements Comparable<Rango>{
 	
-	private Double limIzq;
-	private Double limDer;
+	private final Double limIzq;
+	private final Double limDer;
 	private final Intervalo intervalo;
+	
+	// Ejercicio 3
 	
 	private Rango(Double limIzq, Double limDer, Intervalo intervalo) {
 		
@@ -20,6 +22,8 @@ public class Rango implements Comparable<Rango>{
 		}
 		this.intervalo = intervalo;
 	}
+	
+	// Ejercicio 2
 	
 	public static Rango intervaloAbierto(Double limIzq, Double limDer) {
 		return new Rango(limIzq, limDer, Intervalo.ABIERTO);
@@ -49,6 +53,8 @@ public class Rango implements Comparable<Rango>{
 		return new Rango(limIzq, limDer, Intervalo.CERRADO);
 	}
 	
+	// Ejercicio 7
+	
 	@Override
 	public boolean equals(Object obj) {
 		if(obj == null) {
@@ -68,11 +74,34 @@ public class Rango implements Comparable<Rango>{
 		return false;
 	}
 	
+	// Ejercicio 8
+	
+	@Override
+	public int compareTo(Rango otro) {
+		if(this.equals(otro)) {		// Verificamos si son iguales. Si lo son, retornamos 0 y evitamos hacer las siguientes comparaciones
+			return 0;
+		}
+		
+		if(!this.limIzq.equals(otro.limIzq)) { 	// Comparamos izquierda (valores)
+			return this.limIzq.compareTo(otro.limIzq); 
+		}
+		
+		if(!this.limDer.equals(otro.limDer)) {	// Empató izquierda, se decide por la derecha
+			return this.limDer.compareTo(otro.limDer);
+		}
+		
+		return this.intervalo.ordinal() - otro.intervalo.ordinal(); // Empataron izquierda y derecha, decidimos según la prioridad de los tipos de intervalo
+	}
+	
+	// Ejercicio 9
+	
 	@Override 
 	public String toString() {
 		return  this.intervalo.toCharIzq() + "" + 
 				this.limIzq + ", " + this.limDer + "" + this.intervalo.toCharDer();
 	}
+	
+	// Ejercicio 4
 
 	public boolean contiene(Double numero) {
 		switch(this.intervalo) {
@@ -100,6 +129,8 @@ public class Rango implements Comparable<Rango>{
 		return false;
 	}
 	
+	// Ejercicio 5
+	
 	public boolean contiene(Rango otro) {
 		if(this.equals(otro)) {
 			return true;
@@ -112,26 +143,13 @@ public class Rango implements Comparable<Rango>{
 		return false;
 	}
 	
-	@Override
-	public int compareTo(Rango otro) {
-		if(this.equals(otro)) {		// Verificamos si son iguales. Si lo son, retornamos 0 y evitamos hacer las siguientes comparaciones
-			return 0;
-		}
-		
-		if(!this.limIzq.equals(otro.limIzq)) { 	// Comparamos izquierda (valores)
-			return this.limIzq.compareTo(otro.limIzq); 
-		}
-		
-		if(!this.limDer.equals(otro.limDer)) {	// Empató izquierda, se decide por la derecha
-			return this.limDer.compareTo(otro.limDer);
-		}
-		
-		return this.intervalo.ordinal() - otro.intervalo.ordinal(); // Empataron izquierda y derecha, decidimos según la prioridad de los tipos de intervalo
-	}
+	// Ejercicio 11
 	
 	public static Rango supraRango() {
-		return Rango.intervaloAbierto(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+		return Rango.intervaloAbierto(Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);	// El intervalo (-∞; +∞) contiene a todos los rangos
 	}
+	
+	// Ejercicio 12
 	
 	public Rango sumar(Rango otro) {
 		boolean sumaIncluyeIzq = this.intervalo.getIzq();
@@ -149,10 +167,7 @@ public class Rango implements Comparable<Rango>{
 		return Rango.intervaloAbierto(this.limIzq, otro.limDer);
 	}
 	
-	public void desplazar(Double escalar) {
-		this.limIzq += escalar;
-		this.limDer += escalar;
-	}
+	// Ejercicio 6
 	
 	public boolean hayInterseccion(Rango otro) {
 		
@@ -165,6 +180,8 @@ public class Rango implements Comparable<Rango>{
 		
 		return false;
 	}
+	
+	// Ejercicio 13
 	
 	public Rango interseccion(Rango otro) {
 		if(!this.hayInterseccion(otro)) {
@@ -189,5 +206,27 @@ public class Rango implements Comparable<Rango>{
 			return Rango.intervaloAbiertoIzq(interLimIzq, interLimDer);
 		}
 		return Rango.intervaloAbierto(interLimIzq, interLimDer);
+	}
+	
+	// Ejercicio 14
+	
+//	public void desplazar(Double escalar) {
+//		this.limIzq += escalar;
+//		this.limDer += escalar;
+//	}
+	
+	// Ejercicio 14
+	
+	public Rango desplazar(Double escalar) {													// Como los rangos son inmutables,
+		if(this.intervalo == Intervalo.ABIERTO) {												// al desplazarlo devolvemos un nuevo
+			return Rango.intervaloAbierto(this.limIzq + escalar, this.limDer + escalar);		// rango
+		}
+		if(this.intervalo == Intervalo.ABIERTO_IZQ) {
+			return Rango.intervaloAbiertoIzq(this.limIzq + escalar, this.limDer + escalar);
+		}
+		if(this.intervalo == Intervalo.ABIERTO_DER) {
+			return Rango.intervaloAbiertoDer(this.limIzq + escalar, this.limDer + escalar);
+		}
+		return Rango.intervaloCerrado(this.limIzq + escalar, this.limDer + escalar);
 	}
 }

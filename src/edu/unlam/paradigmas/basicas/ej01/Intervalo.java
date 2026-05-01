@@ -1,5 +1,7 @@
 package edu.unlam.paradigmas.basicas.ej01;
 
+// Ejercicio 1
+
 public enum Intervalo {
 	ABIERTO(false, false),
 	ABIERTO_DER(true, false),
